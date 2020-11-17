@@ -2,6 +2,7 @@ import vk_api
 from pathlib import Path
 import requests
 import os
+import re
 
 login = 'your login'
 password = 'your password'
@@ -19,7 +20,7 @@ if not os.path.exists("albums/"):
 
 i = 0
 for item in albums['items']:
-	album_name = item['title'].replace('"', "'").replace("?", "").replace(":", "").replace("/", "")
+	album_name = re.sub(r'[\\/*?:"<>|]', "", item['title'].replace("...", "").replace("/", "-"))
 	dirname = "albums/" + album_name
 
 	if not os.path.exists(dirname):
@@ -55,4 +56,3 @@ for item in albums['items']:
 		print('Альбом "' + album_name + '" уже скачан, пропускаю...')
 
 	i = i + 1
-
