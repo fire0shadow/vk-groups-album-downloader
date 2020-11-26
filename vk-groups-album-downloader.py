@@ -8,6 +8,7 @@ login = 'your login'
 password = 'your password'
 
 groupid = 'your group id'
+photos_max_count = 1000
 
 vk_session = vk_api.VkApi(login, password)
 vk_session.auth()
@@ -26,7 +27,7 @@ for item in albums['items']:
 	if not os.path.exists(dirname):
 		Path(dirname).mkdir(parents=True, exist_ok=True)
 		print("Скачивается альбом: " + album_name + "...")
-		photos = vk.photos.get(owner_id = item['owner_id'], album_id = item['id'])
+		photos = vk.photos.get(owner_id = item['owner_id'], album_id = item['id'], count = photos_max_count)
 
 		y = 1
 		for photo in photos['items']:
