@@ -4,18 +4,19 @@ A Python3 script using VK API for grabbing and downloading all group's photo alb
 ## Usage
 
 ```
-usage: vk-groups-album-downloader.py [-h] [--fetch-wall] login password id
+usage: vk-groups-album-downloader.py [-h] [--fetch-wall] [--fetch-id FETCH_ID] login password id
 
 Fetch all photo albums in max resolution from VK.com group.
 
 positional arguments:
-  login         Your VK.com login
-  password      Your VK.com password
-  id            VK.com group id for fetching photo albums
+  login                Your VK.com login
+  password             Your VK.com password
+  id                   VK.com group id for fetching photo albums
 
 optional arguments:
-  -h, --help    show this help message and exit
-  --fetch-wall  Fetch photos from group wall
+  -h, --help           show this help message and exit
+  --fetch-wall         Fetch photos from group wall
+  --fetch-id FETCH_ID  Fetch one album from group
 ```
 
 ## Dependencies
