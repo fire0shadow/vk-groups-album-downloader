@@ -10,6 +10,7 @@ parser.add_argument('login', help='Your VK.com login')
 parser.add_argument('password', help='Your VK.com password')
 parser.add_argument('id', help='VK.com group id for fetching photo albums')
 parser.add_argument('--fetch-wall', help='Fetch photos from group wall', required=False, action='store_true')
+parser.add_argument('--fetch-id', help='Fetch one album from group', required=False)
 
 arguments = parser.parse_args()
 
@@ -17,6 +18,7 @@ LOGIN = arguments.login
 PASSWORD = arguments.password
 GROUPID = arguments.id
 FETCH_WALL = arguments.fetch_wall
+FETCH_ID = arguments.fetch_id
 
 def auth():
 	try:
@@ -114,27 +116,34 @@ def download_photos(photos, dirname):
 		y = y + 1
 
 vk = auth()
-ALBUMS_PATH = "albums/" + get_group_name(vk) + " [" + GROUPID + "]/"
+ALBUMS_PATH = "albums/" + re.sub(r'[\\/*?:"<>|]', "", get_group_name(vk).replace("...", "").replace("/", "-")) + " [" + GROUPID + "]/"
 albums = fetch_albums(vk)
 
 if not os.path.exists(ALBUMS_PATH):
 	Path(ALBUMS_PATH).mkdir(parents=True, exist_ok=True)
 
-if FETCH_WALL:
-	wall_dirname = ALBUMS_PATH + 'Wall Photos'
-	print("Fetching album data: Wall photos...")
-	print("Processing wall album data, it may take some time...")
-	download_photos(fetch_all_photos_from_album(vk, '-' + GROUPID, 'wall'), wall_dirname)
+if FETCH_ID:
+	for item in albums['items']:
+		if int(item['id']) == int(FETCH_ID):
+			album_name = re.sub(r'[\\/*?:"<>|]', "", item['title'].replace("...", "").replace("/", "-"))
+			dirname = ALBUMS_PATH + album_name
 
-i = 0
-for item in albums['items']:
-	album_name = re.sub(r'[\\/*?:"<>|]', "", item['title'].replace("...", "").replace("/", "-"))
-	dirname = ALBUMS_PATH + album_name
+			print("Fetching album data: " + album_name + "...")
+			photos = fetch_all_photos_from_album(vk, item['owner_id'], item['id'])
+			download_photos(photos, dirname)
+else:
+	if FETCH_WALL:
+		wall_dirname = ALBUMS_PATH + 'Wall Photos'
+		print("Fetching album data: Wall photos...")
+		print("Processing wall album data, it may take some time...")
+		download_photos(fetch_all_photos_from_album(vk, '-' + GROUPID, 'wall'), wall_dirname)
 
-	print("Fetching album data: " + album_name + "...")
-	photos = fetch_all_photos_from_album(vk, item['owner_id'], item['id'])
-	download_photos(photos, dirname)
+	for item in albums['items']:
+		album_name = re.sub(r'[\\/*?:"<>|]', "", item['title'].replace("...", "").replace("/", "-"))
+		dirname = ALBUMS_PATH + album_name
 
-	i = i + 1
+		print("Fetching album data: " + album_name + "...")
+		photos = fetch_all_photos_from_album(vk, item['owner_id'], item['id'])
+		download_photos(photos, dirname)
 
 print("All albums downloaded, exiting application...")
