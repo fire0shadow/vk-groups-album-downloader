@@ -20,10 +20,16 @@ GROUPID = arguments.id
 FETCH_WALL = arguments.fetch_wall
 FETCH_ID = arguments.fetch_id
 
+def auth_handler():
+    key = input("Enter authentication code: ")
+    remember_device = True
+
+    return key, remember_device
+
 def auth():
 	try:
-		vk_session = vk_api.VkApi(LOGIN, PASSWORD)
-		vk_session.auth()
+		vk_session = vk_api.VkApi(LOGIN, PASSWORD, auth_handler=auth_handler)
+		vk_session.auth(token_only=True)
 		return vk_session.get_api()
 	except vk_api.exceptions.BadPassword:
 		print("Wrong login or password")
